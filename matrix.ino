@@ -48,9 +48,12 @@ const PROGMEM char led_pattern_moveb[STEP_MAX] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
                                   };
 
 
-unsigned char r,g,b; // 色の強さ
 int mynum;
 float power[NUMPIXELS];
+unsigned char r[NUMPIXELS];
+unsigned char g[NUMPIXELS];
+unsigned char b[NUMPIXELS];
+
 int color_pattern;//色相
 
 void setup() {
@@ -67,9 +70,6 @@ void setup() {
   // End of trinket special code
   // put your setup code here, to run once:
   pixels.begin(); // This initializes the NeoPixel library.
-  g =0;
-  r =0;
-  b =0;
   delay(100);
   for(i =0 ;i < NUMPIXELS;i++){
     power[i] = 0;
@@ -80,9 +80,11 @@ void setup() {
   }
   pixels.show(); // This sends the updated pixel color to the hardware.
   //色を初期化
-  g =pgm_read_byte(led_pattern_moveg);
-  r =pgm_read_byte(led_pattern_mover);
-  b =pgm_read_byte(led_pattern_moveb);
+  for(i =0 ;i < NUMPIXELS;i++){
+    g[i] =pgm_read_byte(led_pattern_moveg);
+    r[i] =pgm_read_byte(led_pattern_mover);
+    b[i] =pgm_read_byte(led_pattern_moveb);
+  }
   mynum =0;
   color_pattern = 0;
 }
@@ -92,9 +94,6 @@ void loop() {
   int rdm;
   int i;
   static int count;
-  g =pgm_read_byte(led_pattern_moveg + color_pattern);
-  r =pgm_read_byte(led_pattern_mover + color_pattern);
-  b =pgm_read_byte(led_pattern_moveb + color_pattern);
   if(count == 10){
     rdm = random(8);
     if(rdm == mynum){
@@ -103,7 +102,7 @@ void loop() {
   }
 
   for(i =0;i < NUMPIXELS;i ++){
-      pixels.setPixelColor(i, pixels.Color(r*power[i],g*power[i],b*power[i]));
+      pixels.setPixelColor(i, pixels.Color(r[i]*power[i],g[i]*power[i],b[i]*power[i]));
   }
   
   pixels.show(); // This sends the updated pixel color to the hardware.
@@ -111,6 +110,10 @@ void loop() {
 
     for(i = (NUMPIXELS-1);i >  0 ; i--){
       power[i] = power[i-1];
+      r[i] = r[i-1];
+      g[i] = g[i-1];
+      b[i] = b[i-1];
+      
     }
     if(power[0] == 1){
       power[0] = 0.5;
@@ -129,6 +132,9 @@ void loop() {
   if (digitalRead(SENSER) == 0) { //さわられた
     if(color_pattern < STEP_MAX){
       color_pattern ++;
+      g[0] =pgm_read_byte(led_pattern_moveg + color_pattern);
+      r[0] =pgm_read_byte(led_pattern_mover + color_pattern);
+      b[0] =pgm_read_byte(led_pattern_moveb + color_pattern);
     }
     else {
       color_pattern  = 0;
