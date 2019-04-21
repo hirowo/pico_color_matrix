@@ -17,7 +17,7 @@
  
 
 // How many NeoPixels are attached to the Arduino?
-#define NUMPIXELS      10
+#define NUMPIXELS      20
 // Modul State
 #define MAX_POWER 255
 
